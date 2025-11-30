@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evidence-Based Wellness Shopping List</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card-content {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.3s ease-out;
+        }
+        .card-content.open {
+            grid-template-rows: 1fr;
+        }
+        .card-content > div {
+            overflow: hidden;
+        }
+        .login-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 min-h-screen">
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl p-8 w-full max-w-md">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">Welcome Back</h1>
+                <p class="text-gray-500 mt-2">Enter your credentials to continue</p>
+            </div>
+
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                    <input type="text" id="username"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition outline-none"
+                        placeholder="Enter username" autocomplete="off">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="password"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition outline-none"
+                        placeholder="Enter password">
+                </div>
+                <div id="errorMsg" class="hidden text-red-500 text-sm text-center bg-red-50 py-2 rounded-lg"></div>
+                <button type="submit"
+                    class="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition">
+                    Sign In
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content (Hidden until authenticated) -->
+    <div id="mainContent" class="hidden">
+        <!-- Header -->
+        <header class="bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-50">
+            <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-800">Wellness Shopping List</h1>
+                        <p class="text-xs text-gray-500">Evidence-Based Supplements</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="text-sm text-gray-500 hover:text-purple-600 transition flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                    Sign Out
+                </button>
+            </div>
+        </header>
+
+        <!-- Important Disclaimer -->
+        <div class="max-w-6xl mx-auto px-4 pt-6">
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex gap-3">
+                <div class="shrink-0">
+                    <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-amber-800">Important Note</h3>
+                    <p class="text-sm text-amber-700 mt-1">These supplements have varying levels of scientific evidence. Consult with a healthcare provider before starting any new supplement regimen. Individual results may vary.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <main class="max-w-6xl mx-auto px-4 py-8">
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+                <!-- Card 1: Fenugreek -->
+                <article class="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-lg transition-all duration-300">
+                    <div class="relative">
+                        <img src="https://m.media-amazon.com/images/I/71Xs4V4YLHL._AC_SL1500_.jpg"
+                            alt="Fenugreek Supplement"
+                            class="h-56 w-full object-contain bg-gray-50 p-4">
+                        <div class="absolute left-3 top-3 rounded-full bg-emerald-500 px-2.5 py-1 text-xs font-semibold text-white shadow">
+                            Grade A Evidence
+                        </div>
+                    </div>
+                    <div class="flex flex-1 flex-col p-5">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-1">Fenugreek Extract</h3>
+                        <p class="text-sm text-slate-500 mb-3">Standardized 500mg - Hormonal Support</p>
+
+                        <div class="flex items-baseline gap-2 mb-3">
+                            <span class="text-2xl font-bold text-slate-900">$18.99</span>
+                            <span class="text-sm text-slate-400">60 capsules</span>
+                        </div>
+
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
+                                ★ 4.5 (2,340 reviews)
+                            </span>
+                        </div>
+
+                        <div class="mt-auto space-y-2">
+                            <a href="https://www.amazon.com/s?k=fenugreek+extract+500mg+standardized" target="_blank"
+                                class="flex items-center justify-center w-full py-2.5 bg-gradient-to-r from-orange-400 to-orange-500 text-white font-semibold rounded-xl shadow hover:shadow-md transition">
+                                <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M.045 18.02c.072-.116.187-.124.348-.022 3.636 2.11 7.594 3.166 11.87 3.166 2.852 0 5.668-.533 8.447-1.595l.315-.14c.138-.06.234-.1.293-.065.138.06.133.206.02.435l-.06.116c-.69 1.46-2.532 2.1-5.418 1.91-3.073-.2-5.74-.9-8.007-2.1-2.266-1.2-4.234-2.616-5.912-4.25-.032-.052-.056-.09-.072-.116z"/></svg>
+                                View on Amazon
+                            </a>
+                            <a href="https://www.iherb.com/search?kw=fenugreek%20extract" target="_blank"
+                                class="flex items-center justify-center w-full py-2.5 border border-green-500 text-green-600 font-semibold rounded-xl hover:bg-green-50 transition">
+                                View on iHerb
+                            </a>
+                        </div>
+
+                        <button onclick="toggleCard(this)" class="mt-4 flex items-center justify-between w-full rounded-xl bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 transition">
+                            <span class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                View Evidence & Details
+                            </span>
+                            <svg class="w-4 h-4 transition-transform arrow" viewBox="0 0 20 20" fill="none">
+                                <path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+
+                        <div class="card-content">
+                            <div>
+                                <div class="mt-4 space-y-3 text-sm text-slate-600 border-t pt-4">
+                                    <div class="font-semibold text-slate-800">Scientific Evidence:</div>
+                                    <ul class="space-y-2">
+                                        <li class="flex gap-2">
+                                            <span class="text-emerald-500">✓</span>
+                                            <span>RCTs show 500-1000mg/day reduces menopausal symptoms</span>
+                                        </li>
+                                        <li class="flex gap-2">
+                                            <span class="text-emerald-500">✓</span>
+                                            <span>250mg twice daily improved mood and sexual function in trials</span>
+                                        </li>
+                                        <li class="flex gap-2">
+                                            <span class="text-emerald-500">✓</span>
+                                            <span>Documented galactagogue effects (milk production)</span>
+                                        </li>
+                                    </ul>
+                                    <div class="bg-amber-50 rounded-lg p-3 text-xs text-amber-700">
+                                        <strong>Note:</strong> May affect hormone levels. Consult doctor if pregnant or on anticoagulants.
+                                    </div>
+                                    <a href="https://pubmed.ncbi.nlm.nih.gov/?term=fenugreek+women+hormone" target="_blank" class="inline-flex items-center text-purple-600 hover:text-purple-700 text-xs font-medium">
+                                        View PubMed Studies →
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Card 2: Vitex (Chasteberry) -->
+                <article class="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-lg transition-all duration-300">
+                    <div class="relative">
+                        <img src="https://m.media-amazon.com/images/I/71RP5lMDz7L._AC_SL1500_.jpg"
+                            alt="Vitex Chasteberry"
+                            class="h-56 w-full object-contain bg-gray-50 p-4">
+                        <div class="absolute left-3 top-3 rounded-full bg-emerald-500 px-2.5 py-1 text-xs font-semibold text-white shadow">
+                            Grade A Evidence
+                        </div>
+                    </div>
+                    <div class="flex flex-1 flex-col p-5">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-1">Vitex (Chasteberry)</h3>
+                        <p class="text-sm text-slate-500 mb-3">400mg - PMS & Cycle Support</p>
+
+                        <div class="flex items-baseline gap-2 mb-3">
+                            <span class="text-2xl font-bold text-slate-900">$14.99</span>
+                            <span class="text-sm text-slate-400">120 capsules</span>
+                        </div>
+
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
+                                ★ 4.4 (5,890 reviews)
+                            </span>
+                        </div>
+
+                        <div class="mt-auto space-y-2">
+                            <a href="https://www.amazon.com/s?k=vitex+chasteberry+400mg" target="_blank"
+                                class="flex items-center justify-center w-full py-2.5 bg-gradient-to-r from-orange-400 to-orange-500 text-white font-semibold rounded-xl shadow hover:shadow-md transition">
+                                <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M.045 18.02c.072-.116.187-.124.348-.022 3.636 2.11 7.594 3.166 11.87 3.166 2.852 0 5.668-.533 8.447-1.595l.315-.14c.138-.06.234-.1.293-.065.138.06.133.206.02.435l-.06.116c-.69 1.46-2.532 2.1-5.418 1.91-3.073-.2-5.74-.9-8.007-2.1-2.266-1.2-4.234-2.616-5.912-4.25-.032-.052-.056-.09-.072-.116z"/></svg>
+                                View on Amazon
+                            </a>
+                            <a href="https://www.iherb.com/search?kw=vitex+chasteberry" target="_blank"
+                                class="flex items-center justify-center w-full py-2.5 border border-green-500 text-green-600 font-semibold rounded-xl hover:bg-green-50 transition">
+                                View on iHerb
+                            </a>
+                        </div>
+
+                        <button onclick="toggleCard(this)" class="mt-4 flex items-center justify-between w-full rounded-xl bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 transition">
+                            <span class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                View Evidence & Details
+                            </span>
+                            <svg class="w-4 h-4 transition-transform arrow" viewBox="0 0 20 20" fill="none">
+                                <path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+
+                        <div class="card-content">
+                            <div>
+                                <div class="mt-4 space-y-3 text-sm text-slate-600 border-t pt-4">
+                                    <div class="font-semibold text-slate-800">Scientific Evidence:</div>
+                                    <ul class="space-y-2">
+                                        <li class="flex gap-2">
+                                            <span class="text-emerald-500">✓</span>
+                                            <span>Meta-analysis: 2.6x higher PMS remission rate vs placebo</span>
+                                        </li>
+                                        <li class="flex gap-2">
+                                            <span class="text-emerald-500">✓</span>
+                                            <span>20-40mg/day for 3+ cycles shown effective in RCTs</span>
+                                        </li>
+                                        <li class="flex gap-2">
+                                            <span class="text-emerald-500">✓</span>
+                                            <span>Reduces breast tenderness, irritability, mood swings</span>
+                                        </li>
+                                    </ul>
+                                    <div class="bg-amber-50 rounded-lg p-3 text-xs text-amber-700">
+                                        <strong>Note:</strong> Has dopaminergic activity. Avoid with dopamine-related medications.
+                                    </div>
+                                    <a href="https://pubmed.ncbi.nlm.nih.gov/?term=vitex+agnus+castus+PMS" target="_blank" class="inline-flex items-center text-purple-600 hover:text-purple-700 text-xs font-medium">
+                                        View PubMed Studies →
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Card 3: Maca Root -->
+                <article class="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-lg transition-all duration-300">
+                    <div class="relative">
+                        <img src="https://m.media-amazon.com/images/I/71kZ8OCOIYL._AC_SL1500_.jpg"
+                            alt="Maca Root"
+                            class="h-56 w-full object-contain bg-gray-50 p-4">
+                        <div class="absolute left-3 top-3 rounded-full bg-blue-500 px-2.5 py-1 text-xs font-semibold text-white shadow">
+                            Grade B Evidence
+                        </div>
+                    </div>
+                    <div class="flex flex-1 flex-col p-5">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-1">Organic Maca Root</h3>
+                        <p class="text-sm text-slate-500 mb-3">1500mg - Energy & Libido Support</p>
+
+                        <div class="flex items-baseline gap-2 mb-3">
+                            <span class="text-2xl font-bold text-slate-900">$19.99</span>
+                            <span class="text-sm text-slate-400">120 capsules</span>
+                        </div>
+
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
+                                ★ 4.6 (12,450 reviews)
+                            </span>
+                        </div>
+
+                        <div class="mt-auto space-y-2">
+                            <a href="https://www.amazon.com/s?k=organic+maca+root+1500mg" target="_blank"
+                                class="flex items-center justify-center w-full py-2.5 bg-gradient-to-r from-orange-400 to-orange-500 text-white font-semibold rounded-xl shadow hover:shadow-md transition">
+                                <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M.045 18.02c.072-.116.187-.124.348-.022 3.636 2.11 7.594 3.166 11.87 3.166 2.852 0 5.668-.533 8.447-1.595l.315-.14c.138-.06.234-.1.293-.065.138.06.133.206.02.435l-.06.116c-.69 1.46-2.532 2.1-5.418 1.91-3.073-.2-5.74-.9-8.007-2.1-2.266-1.2-4.234-2.616-5.912-4.25-.032-.052-.056-.09-.072-.116z"/></svg>
+                                View on Amazon
+                            </a>
+                            <a href="https://www.iherb.com/search?kw=maca+root+organic" target="_blank"
+                                class="flex items-center justify-center w-full py-2.5 border border-green-500 text-green-600 font-semibold rounded-xl hover:bg-green-50 transition">
+                                View on iHerb
+                            </a>
+                        </div>
+
+                        <button onclick="toggleCard(this)" class="mt-4 flex items-center justify-between w-full rounded-xl bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 transition">
+                            <span class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                View Evidence & Details
+                            </span>
+                            <svg class="w-4 h-4 transition-transform arrow" viewBox="0 0 20 20" fill="none">
+                                <path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+
+                        <div class="card-content">
+                            <div>
+                                <div class="mt-4 space-y-3 text-sm text-slate-600 border-t pt-4">
+                                    <div class="font-semibold text-slate-800">Scientific Evidence:</div>
+                                    <ul class="space-y-2">
+                                        <li class="flex gap-2">
+                                            <span class="text-emerald-500">✓</span>
+                                            <span>RCTs show improved sexual function in postmenopausal women</span>
+                                        </li>
+                                        <li class="flex gap-2">
+                                            <span class="text-emerald-500">✓</span>
+                                            <span>1.5-3g/day helped SSRI-induced sexual dysfunction</span>
+                                        </li>
+                                        <li class="flex gap-2">
+                                            <span class="text-emerald-500">✓</span>
+                                            <span>Well-tolerated with good safety profile</span>
+                                        </li>
+                                    </ul>
+                                    <div class="bg-blue-50 rounded-lg p-3 text-xs text-blue-700">
+                                        <strong>Best for:</strong> Energy, mood, and libido support. Not proven for hormonal changes.
+                                    </div>
+                                    <a href="https://pubmed.ncbi.nlm.nih.gov/?term=maca+root+women+sexual+function" target="_blank" class="inline-flex items-center text-purple-600 hover:text-purple-700 text-xs font-medium">
+                                        View PubMed Studies →
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Card 4: DIM -->
+                <article class="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-lg transition-all duration-300">
+                    <div class="relative">
+                        <img src="https://m.media-amazon.com/images/I/61N2VFl2URL._AC_SL1500_.jpg"
+                            alt="DIM Supplement"
+                            class="h-56 w-full object-contain bg-gray-50 p-4">
+                        <div class="absolute left-3 top-3 rounded-full bg-blue-500 px-2.5 py-1 text-xs font-semibold text-white shadow">
+                            Grade B Evidence
+                        </div>
+                    </div>
+                    <div class="flex flex-1 flex-col p-5">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-1">DIM (Diindolylmethane)</h3>
+                        <p class="text-sm text-slate-500 mb-3">200mg - Estrogen Metabolism Support</p>
+
+                        <div class="flex items-baseline gap-2 mb-3">
+                            <span class="text-2xl font-bold text-slate-900">$24.99</span>
+                            <span class="text-sm text-slate-400">60 capsules</span>
+                        </div>
+
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
+                                ★ 4.3 (8,920 reviews)
+                            </span>
+                        </div>
+
+                        <div class="mt-auto space-y-2">
+                            <a href="https://www.amazon.com/s?k=DIM+supplement+200mg" target="_blank"
+                                class="flex items-center justify-center w-full py-2.5 bg-gradient-to-r from-orange-400 to-orange-500 text-white font-semibold rounded-xl shadow hover:shadow-md transition">
+                                <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M.045 18.02c.072-.116.187-.124.348-.022 3.636 2.11 7.594 3.166 11.87 3.166 2.852 0 5.668-.533 8.447-1.595l.315-.14c.138-.06.234-.1.293-.065.138.06.133.206.02.435l-.06.116c-.69 1.46-2.532 2.1-5.418 1.91-3.073-.2-5.74-.9-8.007-2.1-2.266-1.2-4.234-2.616-5.912-4.25-.032-.052-.056-.09-.072-.116z"/></svg>
+                                View on Amazon
+                            </a>
+                            <a href="https://www.iherb.com/search?kw=DIM+supplement" target="_blank"
+                                class="flex items-center justify-center w-full py-2.5 border border-green-500 text-green-600 font-semibold rounded-xl hover:bg-green-50 transition">
+                                View on iHerb
+                            </a>
+                        </div>
+
+                        <button onclick="toggleCard(this)" class="mt-4 flex items-center justify-between w-full rounded-xl bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 transition">
+                            <span class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                View Evidence & Details
+                            </span>
+                            <svg class="w-4 h-4 transition-transform arrow" viewBox="0 0 20 20" fill="none">
+                                <path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+
+                        <div class="card-content">
+                            <div>
+                                <div class="mt-4 space-y-3 text-sm text-slate-600 border-t pt-4">
+                                    <div class="font-semibold text-slate-800">Scientific Evidence:</div>
+                                    <ul class="space-y-2">
+                                        <li class="flex gap-2">
+                                            <span class="text-emerald-500">✓</span>
+                                            <span>RCTs show improved estrogen metabolism ratios</span>
+                                        </li>
+                                        <li class="flex gap-2">
+                                            <span class="text-emerald-500">✓</span>
+                                            <span>75-150mg/day shifts metabolism to favorable pathways</span>
+                                        </li>
+                                        <li class="flex gap-2">
+                                            <span class="text-emerald-500">✓</span>
+                                            <span>Derived from cruciferous vegetables (broccoli, etc.)</span>
+                                        </li>
+                                    </ul>
+                                    <div class="bg-amber-50 rounded-lg p-3 text-xs text-amber-700">
+                                        <strong>Caution:</strong> Can interact with medications. Consult doctor if on any prescriptions.
+                                    </div>
+                                    <a href="https://pubmed.ncbi.nlm.nih.gov/?term=DIM+diindolylmethane+estrogen" target="_blank" class="inline-flex items-center text-purple-600 hover:text-purple-700 text-xs font-medium">
+                                        View PubMed Studies →
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Card 5: Evening Primrose Oil -->
+                <article class="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-lg transition-all duration-300">
+                    <div class="relative">
+                        <img src="https://m.media-amazon.com/images/I/71Rp+WVlHYL._AC_SL1500_.jpg"
+                            alt="Evening Primrose Oil"
+                            class="h-56 w-full object-contain bg-gray-50 p-4">
+                        <div class="absolute left-3 top-3 rounded-full bg-yellow-500 px-2.5 py-1 text-xs font-semibold text-white shadow">
+                            Grade C Evidence
+                        </div>
+                    </div>
+                    <div class="flex flex-1 flex-col p-5">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-1">Evening Primrose Oil</h3>
+                        <p class="text-sm text-slate-500 mb-3">1300mg - Skin & Hormonal Support</p>
+
+                        <div class="flex items-baseline gap-2 mb-3">
+                            <span class="text-2xl font-bold text-slate-900">$12.99</span>
+                            <span class="text-sm text-slate-400">120 softgels</span>
+                        </div>
+
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
+                                ★ 4.5 (15,670 reviews)
+                            </span>
+                        </div>
+
+                        <div class="mt-auto space-y-2">
+                            <a href="https://www.amazon.com/s?k=evening+primrose+oil+1300mg" target="_blank"
+                                class="flex items-center justify-center w-full py-2.5 bg-gradient-to-r from-orange-400 to-orange-500 text-white font-semibold rounded-xl shadow hover:shadow-md transition">
+                                <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M.045 18.02c.072-.116.187-.124.348-.022 3.636 2.11 7.594 3.166 11.87 3.166 2.852 0 5.668-.533 8.447-1.595l.315-.14c.138-.06.234-.1.293-.065.138.06.133.206.02.435l-.06.116c-.69 1.46-2.532 2.1-5.418 1.91-3.073-.2-5.74-.9-8.007-2.1-2.266-1.2-4.234-2.616-5.912-4.25-.032-.052-.056-.09-.072-.116z"/></svg>
+                                View on Amazon
+                            </a>
+                            <a href="https://www.iherb.com/search?kw=evening+primrose+oil" target="_blank"
+                                class="flex items-center justify-center w-full py-2.5 border border-green-500 text-green-600 font-semibold rounded-xl hover:bg-green-50 transition">
+                                View on iHerb
+                            </a>
+                        </div>
+
+                        <button onclick="toggleCard(this)" class="mt-4 flex items-center justify-between w-full rounded-xl bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 transition">
+                            <span class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                                View Evidence & Details
+                            </span>
+                            <svg class="w-4 h-4 transition-transform arrow" viewBox="0 0 20 20" fill="none">
+                                <path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+
+                        <div class="card-content">
+                            <div>
+                                <div class="mt-4 space-y-3 text-sm text-slate-600 border-t pt-4">
+                                    <div class="font-semibold text-slate-800">Scientific Evidence:</div>
+                                    <ul class="space-y-2">
+                                        <li class="flex gap-2">
+                                            <span class="text-yellow-500">~</span>
+                                            <span>Limited evidence for cyclical breast discomfort</span>
+                                        </li>
+                                        <li class="flex gap-2">
+                                            <span class="text-emerald-500">✓</span>
+                                            <span>Rich in GLA (gamma-linolenic acid)</span>
+                                        </li>
+                                        <li class="flex gap-2">
+                                            <span class="text-emerald-500">✓</span>
+                                            <span>Generally safe and well-tolerated</span>
+                                        </li>
+                                    </ul>
+                                    <div class="bg-yellow-50 rounded-lg p-3 text-xs text-yellow-700">
+                                        <strong>Honest note:</strong> Reviews show minimal advantage over placebo for breast symptoms. Better for skin health.
+                                    </div>
+                                    <a href="https://pubmed.ncbi.nlm.nih.gov/?term=evening+primrose+oil+mastalgia" target="_blank" class="inline-flex items-center text-purple-600 hover:text-purple-700 text-xs font-medium">
+                                        View PubMed Studies →
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Card 6: Black Cohosh -->
+                <article class="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-lg transition-all duration-300">
+                    <div class="relative">
+                        <img src="https://m.media-amazon.com/images/I/71wXMPzMYtL._AC_SL1500_.jpg"
+                            alt="Black Cohosh"
+                            class="h-56 w-full object-contain bg-gray-50 p-4">
+                        <div class="absolute left-3 top-3 rounded-full bg-yellow-500 px-2.5 py-1 text-xs font-semibold text-white shadow">
+                            Grade C Evidence
+                        </div>
+                    </div>
+                    <div class="flex flex-1 flex-col p-5">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-1">Black Cohosh</h3>
+                        <p class="text-sm text-slate-500 mb-3">540mg - Menopause Support</p>
+
+                        <div class="flex items-baseline gap-2 mb-3">
+                            <span class="text-2xl font-bold text-slate-900">$15.99</span>
+                            <span class="text-sm text-slate-400">100 capsules</span>
+                        </div>
+
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
+                                ★ 4.4 (7,230 reviews)
+                            </span>
+                        </div>
+
+                        <div class="mt-auto space-y-2">
+                            <a href="https://www.amazon.com/s?k=black+cohosh+menopause" target="_blank"
+                                class="flex items-center justify-center w-full py-2.5 bg-gradient-to-r from-orange-400 to-orange-500 text-white font-semibold rounded-xl shadow hover:shadow-md transition">
+                                <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M.045 18.02c.072-.116.187-.124.348-.022 3.636 2.11 7.594 3.166 11.87 3.166 2.852 0 5.668-.533 8.447-1.595l.315-.14c.138-.06.234-.1.293-.065.138.06.133.206.02.435l-.06.116c-.69 1.46-2.532 2.1-5.418 1.91-3.073-.2-5.74-.9-8.007-2.1-2.266-1.2-4.234-2.616-5.912-4.25-.032-.052-.056-.09-.072-.116z"/></svg>
+                                View on Amazon
+                            </a>
+                            <a href="https://www.iherb.com/search?kw=black+cohosh" target="_blank"
+                                class="flex items-center justify-center w-full py-2.5 border border-green-500 text-green-600 font-semibold rounded-xl hover:bg-green-50 transition">
+                                View on iHerb
+                            </a>
+                        </div>
+
+                        <button onclick="toggleCard(this)" class="mt-4 flex items-center justify-between w-full rounded-xl bg-slate-50 px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 transition">
+                            <span class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                                View Evidence & Details
+                            </span>
+                            <svg class="w-4 h-4 transition-transform arrow" viewBox="0 0 20 20" fill="none">
+                                <path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+
+                        <div class="card-content">
+                            <div>
+                                <div class="mt-4 space-y-3 text-sm text-slate-600 border-t pt-4">
+                                    <div class="font-semibold text-slate-800">Scientific Evidence:</div>
+                                    <ul class="space-y-2">
+                                        <li class="flex gap-2">
+                                            <span class="text-yellow-500">~</span>
+                                            <span>Mixed results for hot flashes in trials</span>
+                                        </li>
+                                        <li class="flex gap-2">
+                                            <span class="text-emerald-500">✓</span>
+                                            <span>Some trials show 75% symptom reduction over 6 months</span>
+                                        </li>
+                                        <li class="flex gap-2">
+                                            <span class="text-yellow-500">~</span>
+                                            <span>Quality-controlled extracts (iCR) may work better</span>
+                                        </li>
+                                    </ul>
+                                    <div class="bg-red-50 rounded-lg p-3 text-xs text-red-700">
+                                        <strong>Warning:</strong> Rare liver toxicity reports. Monitor with long-term use. Use quality-controlled brands.
+                                    </div>
+                                    <a href="https://pubmed.ncbi.nlm.nih.gov/?term=black+cohosh+menopause" target="_blank" class="inline-flex items-center text-purple-600 hover:text-purple-700 text-xs font-medium">
+                                        View PubMed Studies →
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+        </main>
+
+        <!-- Evidence Legend -->
+        <div class="max-w-6xl mx-auto px-4 pb-8">
+            <div class="bg-white rounded-2xl border border-slate-200 p-6">
+                <h3 class="font-semibold text-slate-800 mb-4">Evidence Grades Explained</h3>
+                <div class="grid sm:grid-cols-3 gap-4 text-sm">
+                    <div class="flex items-start gap-3">
+                        <span class="shrink-0 w-3 h-3 rounded-full bg-emerald-500 mt-1"></span>
+                        <div>
+                            <div class="font-medium text-slate-800">Grade A</div>
+                            <div class="text-slate-500">Multiple RCTs or meta-analyses support efficacy</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="shrink-0 w-3 h-3 rounded-full bg-blue-500 mt-1"></span>
+                        <div>
+                            <div class="font-medium text-slate-800">Grade B</div>
+                            <div class="text-slate-500">Some RCTs show benefit; more research needed</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="shrink-0 w-3 h-3 rounded-full bg-yellow-500 mt-1"></span>
+                        <div>
+                            <div class="font-medium text-slate-800">Grade C</div>
+                            <div class="text-slate-500">Mixed or limited evidence; results inconsistent</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-white/80 backdrop-blur-sm border-t border-slate-200 py-6">
+            <div class="max-w-6xl mx-auto px-4 text-center text-sm text-slate-500">
+                <p>This information is for educational purposes only. Always consult a healthcare provider before starting supplements.</p>
+                <p class="mt-2">Sources: PubMed, Cochrane Reviews, Clinical Trials Registry</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Authentication
+        const VALID_USER = 'molly';
+        const VALID_PASS = 'molly';
+
+        function checkAuth() {
+            const isAuth = sessionStorage.getItem('authenticated') === 'true';
+            if (isAuth) {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.toLowerCase().trim();
+            const password = document.getElementById('password').value.toLowerCase().trim();
+
+            if (username === VALID_USER && password === VALID_PASS) {
+                sessionStorage.setItem('authenticated', 'true');
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+            } else {
+                const errorMsg = document.getElementById('errorMsg');
+                errorMsg.textContent = 'Invalid credentials. Please try again.';
+                errorMsg.classList.remove('hidden');
+                document.getElementById('password').value = '';
+            }
+        });
+
+        function logout() {
+            sessionStorage.removeItem('authenticated');
+            document.getElementById('mainContent').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('errorMsg').classList.add('hidden');
+        }
+
+        // Card expansion
+        function toggleCard(button) {
+            const card = button.closest('article');
+            const content = card.querySelector('.card-content');
+            const arrow = button.querySelector('.arrow');
+
+            content.classList.toggle('open');
+            arrow.style.transform = content.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0)';
+        }
+
+        // Check auth on load
+        checkAuth();
+    </script>
+</body>
+</html>
